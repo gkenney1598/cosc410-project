@@ -1,12 +1,18 @@
 import requests
 from bs4 import BeautifulSoup
+import csv
 
 base = "https://medlineplus.gov/druginfo/meds/"
 headers = {"User-Agent": "Mozilla/5.0"}
 
 drug_texts = []
 
-keys = ["a606008", "a601105"]
+keys = []
+
+with open('drug_keys.csv', newline='', encoding='utf-8') as f:
+    reader = csv.reader(f)
+    for row in reader:
+        keys.append(row[0])
 
 for key in keys:
     url = base + key + ".html"
@@ -28,6 +34,7 @@ for key in keys:
 
     paragraphs = [p.get_text(" ", strip=True) for p in container.find_all("div", "section-body")] #go by section body not by paragraph
     header = [h.get_text(" ", strip=True) for h in container.find_all("div", "section-title")]
+    name = soup.find("h1", "with-also").get_text(" ", strip=True)
     for i in range(len(header)):
         text += header[i] + "\n"
         text += paragraphs[i] + "\n"
@@ -35,7 +42,14 @@ for key in keys:
     drug_texts.append({
         "key": key,
         "url": url,
+        "name": name,
         "text": text
     })
+
+    with open('drug_instructions.csv', 'w', newline='', encoding='utf-8') as csvfile:
+        fieldnames = ['key', 'url', 'name', 'text']
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(drug_texts)
 
 print("\n Scraped", print(drug_texts), "drugs.")

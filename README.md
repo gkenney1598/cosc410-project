@@ -1,6 +1,4 @@
-# cosc410-project
-
-## Research Question
+# Research Question
 
 Can we train a model to predict whether or not a set of instructions for a drug is human-generated or AI-generated?
 

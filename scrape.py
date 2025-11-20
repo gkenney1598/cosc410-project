@@ -6,17 +6,15 @@ base = "https://medlineplus.gov/druginfo/meds/"
 headers = {"User-Agent": "Mozilla/5.0"}
 
 drug_texts = []
-
 keys = []
 
-with open('drug_keys.csv', newline='', encoding='utf-8') as f:
+with open('data/drug_keys.csv', newline='', encoding='utf-8') as f:
     reader = csv.reader(f)
     for row in reader:
         keys.append(row[0])
 
 for key in keys:
     url = base + key + ".html"
-    print("Scraping:", url)
 
     r = requests.get(url, headers=headers)
     if r.status_code != 200:
@@ -36,20 +34,16 @@ for key in keys:
     header = [h.get_text(" ", strip=True) for h in container.find_all("div", "section-title")]
     name = soup.find("h1", "with-also").get_text(" ", strip=True)
     for i in range(len(header)):
-        text += header[i] + "\n"
-        text += paragraphs[i] + "\n"
+        text += header[i] + " "
+        text += paragraphs[i] + " "
 
     drug_texts.append({
-        "key": key,
-        "url": url,
         "name": name,
         "text": text
     })
 
-    with open('drug_instructions.csv', 'w', newline='', encoding='utf-8') as csvfile:
-        fieldnames = ['key', 'url', 'name', 'text']
+    with open('data/drug_instructions.csv', 'w', newline='', encoding='utf-8') as csvfile:
+        fieldnames = ['name', 'text']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
         writer.writerows(drug_texts)
-
-print("\n Scraped", print(drug_texts), "drugs.")

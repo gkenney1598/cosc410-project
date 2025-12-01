@@ -1,5 +1,5 @@
-import numpy as np
 import pandas as pd
+import random
 from sklearn.model_selection import train_test_split
 from transformers import RobertaTokenizer, RobertaForSequenceClassification
 from transformers import Trainer, TrainingArguments
@@ -15,6 +15,12 @@ train_ds = Dataset.from_pandas(train_df)
 test_ds = Dataset.from_pandas(test_df)
 
 tokenizer = RobertaTokenizer.from_pretrained("roberta-base")
+
+for row in df.iterrows():
+    sentence = row[1]["sentence"];
+    beginning = random.randint(0, len(sentence) - 512)
+    truncated_sentence = sentence[beginning:beginning + 512]
+    row[1]["sentence"] = truncated_sentence
 
 def tokenize(batch):
     return tokenizer(

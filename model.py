@@ -16,18 +16,18 @@ test_ds = Dataset.from_pandas(test_df)
 
 tokenizer = RobertaTokenizer.from_pretrained("roberta-base")
 
-for row in df.iterrows():
-    sentence = row[1]["sentence"];
+for index, row in df.iterrows():
+    sentence = row["sentence"];
     beginning = random.randint(0, len(sentence) - 512)
     truncated_sentence = sentence[beginning:beginning + 512]
-    row[1]["sentence"] = truncated_sentence
+    df.at[index, "sentence"] = truncated_sentence
 
 def tokenize(batch):
     return tokenizer(
         batch["sentence"],
         truncation=True,
         padding="max_length",
-        max_length=256,
+        max_length=512,
     )
 
 train_ds = train_ds.map(tokenize, batched=True)
